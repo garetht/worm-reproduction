@@ -1,22 +1,12 @@
 import csv
 import sys
-from dataclasses import dataclass
 from typing import List
-from enum import Enum
 
-class SentOrRecEnum(Enum):
-    """Enum for the SentOrRec field."""
-    SENT = "Sent"
-    REC = "Rec"
+from models.employee_email import EmployeeEmail
+from models.sent_or_received import SentOrReceived
 
-@dataclass
-class CsvRow:
-    """Represents a single row in the CSV file."""
-    Sender: str
-    SentOrRec: SentOrRecEnum
-    Body: str
 
-def parse_csv(file_path: str) -> List[CsvRow]:
+def parse_csv(file_path: str) -> List[EmployeeEmail]:
     """
     Parses a CSV file with a header and a body column that can contain newlines.
 
@@ -35,8 +25,8 @@ def parse_csv(file_path: str) -> List[CsvRow]:
         
         for row in reader:
             try:
-                sent_or_rec_enum = SentOrRecEnum(row['SentOrRec'])
-                data.append(CsvRow(
+                sent_or_rec_enum = SentOrReceived(row['SentOrRec'])
+                data.append(EmployeeEmail(
                     Sender=row['Sender'],
                     SentOrRec=sent_or_rec_enum,
                     Body=row['Body']
@@ -52,7 +42,7 @@ if __name__ == '__main__':
 
     file_path: str = sys.argv[1]
     try:
-        parsed_data: List[CsvRow] = parse_csv(file_path)
+        parsed_data: List[EmployeeEmail] = parse_csv(file_path)
         for row in parsed_data:
             print(row)
     except FileNotFoundError:
