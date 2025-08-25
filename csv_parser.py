@@ -6,7 +6,7 @@ from models.employee_email import EmployeeEmail
 from models.sent_or_received import SentOrReceived
 
 
-def parse_csv(file_path: str) -> List[EmployeeEmail]:
+def parse_csv(file_path: str) -> list[EmployeeEmail]:
     """
     Parses a CSV file with a header and a body column that can contain newlines.
 
@@ -35,6 +35,26 @@ def parse_csv(file_path: str) -> List[EmployeeEmail]:
                 print(f"Warning: Skipping row with invalid SentOrRec value: {row['SentOrRec']}", file=sys.stderr)
     return data
 
+def serialize(data: list[EmployeeEmail], file_path: str):
+    """
+    Serializes a list of EmployeeEmail objects to a CSV file.
+
+    Args:
+        data: A list of EmployeeEmail objects.
+        file_path: The path to the output CSV file.
+    """
+    with open(file_path, 'w', newline='') as csvfile:
+        fieldnames = ['Sender', 'SentOrRec', 'Body']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        writer.writeheader()
+        for email in data:
+            writer.writerow({
+                'Sender': email.Sender,
+                'SentOrRec': email.SentOrRec.value,
+                'Body': email.Body
+            })
+
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("Usage: python csv_parser.py <path_to_csv_file>")
@@ -42,7 +62,7 @@ if __name__ == '__main__':
 
     file_path: str = sys.argv[1]
     try:
-        parsed_data: List[EmployeeEmail] = parse_csv(file_path)
+        parsed_data: list[EmployeeEmail] = parse_csv(file_path)
         for row in parsed_data:
             print(row)
     except FileNotFoundError:

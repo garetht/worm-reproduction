@@ -12,17 +12,23 @@ from typing import Optional, List
 
 import mailparser
 
+import csv_parser
 from models.employee_email import EmployeeEmail
 
 
 class InsufficientEntriesException(Exception):
     pass
 
+
 @dataclasses.dataclass
 class ParsedEmployeeEmails:
     name: str
     sent_emails: list[EmployeeEmail]
     received_emails: list[EmployeeEmail]
+
+    @property
+    def all_emails(self) -> list[EmployeeEmail]:
+        return self.sent_emails + self.received_emails
 
 
 def random_select_from_directory(directory_paths: list[Path], limit: Optional[int] = 20, require_file=False) -> List[
@@ -94,8 +100,8 @@ def extract_emails(count: int = 20) -> list[ParsedEmployeeEmails]:
         received_path = employee_path / "inbox"
 
         try:
-            sent_emails = random_select_from_directory(sent_paths, require_file=True)
-            received_emails = random_select_from_directory([received_path], require_file=True)
+            sent_emails = random_select_from_directory(sent_paths, require_file=True, limit=None)
+            received_emails = random_select_from_directory([received_path], require_file=True, limit=None)
         except InsufficientEntriesException:
             continue
 
@@ -122,11 +128,24 @@ def extract_emails(count: int = 20) -> list[ParsedEmployeeEmails]:
                 except UnicodeDecodeError:
                     pass
 
-        selected_employees.append(ParsedEmployeeEmails(
+        if len(parsed_sent_mails) < 1:
+            continue
+
+        emp_mail = ''.join([' '.join(t) for t in parsed_sent_mails[0].headers.get("From", [])])
+        parsed_emails = ParsedEmployeeEmails(
             name=employee_path.name,
-            sent_emails=[EmployeeEmail.from_mailparser(m) for m in parsed_sent_mails],
-            received_emails=[EmployeeEmail.from_mailparser(m) for m in parsed_received_mails]
-        ))
+            sent_emails=[EmployeeEmail.from_mailparser(m, employee_email=emp_mail, is_sent=True) for m in
+                         parsed_sent_mails],
+            received_emails=[EmployeeEmail.from_mailparser(m, employee_email=emp_mail, is_sent=False) for m in
+                             parsed_received_mails]
+        )
+
+        print(len(parsed_emails.sent_emails), len(parsed_emails.received_emails))
+        if len(parsed_emails.sent_emails) < 50 or len(parsed_emails.received_emails) < 50:
+            print("skipping this one")
+            continue
+
+        selected_employees.append(parsed_emails)
 
         if len(selected_employees) == count:
             return selected_employees
@@ -135,7 +154,14 @@ def extract_emails(count: int = 20) -> list[ParsedEmployeeEmails]:
 
 
 if __name__ == "__main__":
-    print("starting")
-    emails = extract_emails()
-    print("done with emails")
-    print(emails[0].sent_emails[0])
+    employee_emails = extract_emails()
+    assert len(employee_emails) == 20, "not length 20, was " + str(len(employee_emails))
+    for employee_email in employee_emails:
+        assert len(employee_email.received_emails) == 50, "received not length 50"
+        assert len(employee_email.sent_emails) == 50, "sent not length 50"
+
+    all_emails = []
+    for employee in employee_emails:
+        all_emails.extend(employee.all_emails)
+
+    csv_parser.serialize(all_emails, './database/all_emails.csv')

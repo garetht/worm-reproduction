@@ -14,9 +14,9 @@ class EmployeeEmail:
     Body: str
 
     @classmethod
-    def from_mailparser(cls, parsed_mail: mailparser.core.MailParser, is_sent: bool = False) -> 'EmployeeEmail':
+    def from_mailparser(cls, parsed_mail: mailparser.core.MailParser, employee_email: str, is_sent: bool = False) -> 'EmployeeEmail':
         return EmployeeEmail(
-            Sender=''.join([' '.join(t) for t in parsed_mail.headers.get("From", [])]),
+            Sender=''.join([' '.join(t) for t in parsed_mail.headers.get("From", [])]) if is_sent else employee_email,
             SentOrRec=SentOrReceived.SENT if is_sent else SentOrReceived.REC,
             Body=get_text_body(parsed_mail.message)
         )
