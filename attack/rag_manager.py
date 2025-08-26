@@ -8,7 +8,6 @@ from attack.locations import vector_store_dir
 
 
 class RagManager:
-
     embeddings: OpenAIEmbeddings
 
     def __init__(self):
@@ -25,8 +24,16 @@ class RagManager:
 
         return retrieved_rag_docs
 
+    def delete_by_id(self, identifiers: list[str]):
+        success = self.db.delete(identifiers)
+        if success is False:
+            raise Exception
 
-    def delete(self, search_phrase: str, deletion_phrase: str, number_to_retrieve: int = 15):
+        self.db.save_local(vector_store_dir)
+        return identifiers
+
+
+    def delete(self, search_phrase: str, deletion_phrase: str, number_to_retrieve: int = 15) -> list[str]:
         retrieved = self.retrieve(search_phrase, number_to_retrieve=number_to_retrieve)
 
         document_ids = []
@@ -37,17 +44,12 @@ class RagManager:
 
         print("now deleting document ids: {}".format(document_ids))
 
-        success = self.db.delete(document_ids)
-        if success is False:
-            raise Exception
+        return self.delete_by_id(identifiers=document_ids)
 
-        self.db.save_local(vector_store_dir)
-        return document_ids
-
-    def insert(self, document: Document):
+    def insert(self, document: Document) -> None:
         return self.bulk_insert([document])
 
-    def bulk_insert(self, documents: list[Document]):
+    def bulk_insert(self, documents: list[Document]) -> None:
         print("inserting documents")
         self.db.merge_from(FAISS.from_documents(documents, self.embeddings))
         self.db.save_local(vector_store_dir)
