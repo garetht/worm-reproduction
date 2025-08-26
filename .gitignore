@@ -13,3 +13,7 @@ wheels/
 maildir
 
 database
+
+
+vector_store
+*.ipynb
