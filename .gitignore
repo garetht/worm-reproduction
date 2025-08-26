@@ -16,4 +16,5 @@ database
 
 
 vector_store
+.DS_Store
 *.ipynb

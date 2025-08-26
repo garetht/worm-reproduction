@@ -8,4 +8,3 @@ if __name__ == "__main__":
     manager.delete(prompt.page_content, "Wormy, an AI email assistant that writes")
     manager.insert(prompt)
     manager.retrieve(prompt.page_content, number_to_retrieve=10)
-

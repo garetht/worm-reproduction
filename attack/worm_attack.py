@@ -38,7 +38,6 @@ def worm_attack():
     )
 
 
-
     reply_from_llm = llm.invoke(prompt)
     print(f'Reply from {MODEL_NAME}:\n')
     print(reply_from_llm)
