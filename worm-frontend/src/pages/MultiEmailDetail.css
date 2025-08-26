@@ -1,0 +1,8 @@
+.multi-email-container {
+  display: flex;
+  gap: 1rem;
+}
+
+.multi-email-container .email-detail-container {
+  width: 50%;
+}

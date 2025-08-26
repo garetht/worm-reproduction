@@ -99,7 +99,7 @@ def build_vector_database() -> None:
 
 
 if __name__ == "__main__":
-    # build_vector_database()
-    document = create_self_replicating_prompt()
-    rag_manager = RagManager()
-    rag_manager.insert(document)
+    build_vector_database()
+    # document = create_self_replicating_prompt()
+    # rag_manager = RagManager()
+    # rag_manager.insert(document)

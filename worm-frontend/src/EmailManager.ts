@@ -1,32 +1,28 @@
 export interface Email {
-  id: string;
+  id: number;
   from: string;
   to: string;
   subject: string;
   body: string;
 }
 
-const emails: Email[] = [
-  {
-    id: '1',
-    from: 'sender1@example.com',
-    to: 'user@example.com',
-    subject: 'First Email',
-    body: '<h1>Hello!</h1><p>This is the body of the first email.</p>',
-  },
-  {
-    id: '2',
-    from: 'sender2@example.com',
-    to: 'user@example.com',
-    subject: 'Second Email',
-    body: '<h1>Hi there!</h1><p>This is the second email body.</p>',
-  },
-];
+const API_URL = 'http://127.0.0.1:8000';
 
-export const getEmailsForUser = (userEmail: string): Email[] => {
-  return emails.filter(email => email.to === userEmail);
+export const getEmailsForUser = async (userEmail: string): Promise<Email[]> => {
+  try {
+    const response = await fetch(`${API_URL}/emails/${userEmail}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch emails');
+    }
+    const data = await response.json();
+    return data.emails;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 };
 
-export const getEmailById = (emailId: string): Email | undefined => {
+export const getEmailById = async (userEmail: string, emailId: number): Promise<Email | undefined> => {
+  const emails = await getEmailsForUser(userEmail);
   return emails.find(email => email.id === emailId);
 };

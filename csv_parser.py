@@ -28,6 +28,8 @@ def parse_csv(file_path: str) -> list[EmployeeEmail]:
                 sent_or_rec_enum = SentOrReceived(row['SentOrRec'])
                 data.append(EmployeeEmail(
                     Sender=row['Sender'],
+                    To=row['To'],
+                    Subject=row['Subject'],
                     SentOrRec=sent_or_rec_enum,
                     Body=row['Body']
                 ))
@@ -44,13 +46,15 @@ def serialize(data: list[EmployeeEmail], file_path: str):
         file_path: The path to the output CSV file.
     """
     with open(file_path, 'w', newline='') as csvfile:
-        fieldnames = ['Sender', 'SentOrRec', 'Body']
+        fieldnames = ['Sender', 'To', 'Subject', 'SentOrRec', 'Body']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()
         for email in data:
             writer.writerow({
                 'Sender': email.Sender,
+                'To': email.To,
+                'Subject': email.Subject,
                 'SentOrRec': email.SentOrRec.value,
                 'Body': email.Body
             })

@@ -1,5 +1,5 @@
 .email-detail-container {
-  width: 800px;
+  width: 500px;
   margin: 0 auto;
   padding: 2rem;
   background-color: #fff;
@@ -22,6 +22,11 @@
   font-size: 1rem;
   color: #555;
   margin-bottom: 0.5rem;
+}
+
+.email-detail-side-by-side {
+  display: flex;
+  gap: 1rem;
 }
 
 .email-detail-body {

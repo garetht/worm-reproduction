@@ -1,13 +1,13 @@
 import { Routes, Route } from 'react-router-dom';
 import EmailList from './pages/EmailList';
-import EmailDetail from './pages/EmailDetail';
+import MultiEmailDetail from './pages/MultiEmailDetail';
 import './App.css';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<EmailList />} />
-      <Route path="/email/:id" element={<EmailDetail />} />
+      <Route path="/email/:id" element={<MultiEmailDetail />} />
     </Routes>
   );
 }
