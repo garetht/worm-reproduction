@@ -1,5 +1,8 @@
+import dataclasses
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from attack.email_manager import EmailManager
 
 app = FastAPI()
@@ -21,4 +24,6 @@ def get_emails(email: str):
     """
     Retrieves all emails received by a given user.
     """
-    return {"emails": email_manager.retrieve_emails(email)}
+    return {
+        "emails": [dataclasses.asdict(e) for e in email_manager.retrieve_email_inbox(email)]
+    }

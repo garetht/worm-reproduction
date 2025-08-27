@@ -1,19 +1,22 @@
 import os
+from typing import Iterable, Any
 
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
 
 
-
 class RagManager:
+    user: str
     embeddings: OpenAIEmbeddings
 
-    vector_store_dir = 'vector_store'
+    VECTOR_STORE_DIR = './vector_store'
 
     def __init__(self, user: str):
+        self.user = user
         self.embeddings = embeddings = OpenAIEmbeddings(api_key=os.environ['OPENAI_API_KEY'])
-        self.user_path = os.path.join(self.vector_store_dir, user)
+        print("creating rag manager for user " + user)
+        self.user_path = os.path.join(self.VECTOR_STORE_DIR, user)
         os.makedirs(self.user_path, exist_ok=True)
 
         file_path = os.path.join(self.user_path, "index.faiss")
@@ -23,16 +26,29 @@ class RagManager:
            self.db = FAISS.load_local(self.user_path, embeddings, allow_dangerous_deserialization=True)
 
 
+    @classmethod
+    def vector_store_managers(cls) -> Iterable['RagManager']:
+        for user in cls.vector_store_users():
+            yield RagManager(user=user)
+
+    @classmethod
+    def vector_store_users(cls) -> Iterable[str]:
+        for user in os.listdir(cls.VECTOR_STORE_DIR):
+            if user != ".DS_Store" and os.path.isdir(os.path.join(cls.VECTOR_STORE_DIR, user)):
+                yield user
+
     def retrieve(self, email: str, number_to_retrieve: int = 5) -> list[Document]:
         if self.db is None:
+            print("database was none: {}".format(self.user))
             return []
 
+        # print("retrieving email: {}".format(email))
         retrieved_rag_docs = self.db.similarity_search(email, k=number_to_retrieve)
         for doc in retrieved_rag_docs:
-            print("\nNew Document\n=====================")
-            print(doc.id)
+            # print("\nNew Document\n=====================")
+            # print(doc.id)
             truncation = 2200
-            print(doc.page_content[:truncation] + "... (truncated at {} characters)".format(truncation))
+            # print(doc.page_content[:truncation] + "... (truncated at {} characters)".format(truncation))
 
         return retrieved_rag_docs
 
@@ -44,11 +60,12 @@ class RagManager:
         if success is False:
             raise Exception
 
-        self.db.save_local(vector_store_dir)
+        self.db.save_local(self.user_path)
         return identifiers
 
     def delete(self, search_phrase: str, deletion_phrase: str, number_to_retrieve: int = 15) -> list[str]:
         if self.db is None:
+            print("no database found for deletion:" + self.user)
             return []
 
         retrieved = self.retrieve(search_phrase, number_to_retrieve=number_to_retrieve)
@@ -75,3 +92,10 @@ class RagManager:
 
         self.db.save_local(self.user_path)
         print("added documents")
+
+    def similarity_search(self, email: str, number_to_retrieve: int) -> list[Document]:
+        if self.db is None:
+            print("no database found for similarity search:" + self.user)
+            return []
+
+        return self.db.similarity_search(email, k=number_to_retrieve)
