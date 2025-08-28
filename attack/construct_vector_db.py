@@ -8,6 +8,8 @@ from langchain_core.documents import Document
 
 from attack.locations import rag_emails_csv_dir
 from attack.rag_manager import RagManager
+from models.embeddings import EmbeddingsType
+from prompts.worm_prompt import WormPrompts
 
 
 @dataclasses.dataclass
@@ -54,13 +56,8 @@ def read_emails_from_file() -> dict[str, PersonalEmails]:  # this function reads
     return emails_by_person
 
 
-def build_vector_database() -> None:
+def build_vector_database(embeddings_type: EmbeddingsType = EmbeddingsType.OpenAI) -> None:
     np.random.seed(0)
-
-    emails = []
-
-    self_replicating_prompt_document = create_self_replicating_prompt()
-    emails.append(self_replicating_prompt_document)
 
     emails = read_emails_from_file()
 
@@ -76,28 +73,16 @@ def build_vector_database() -> None:
             emails_to_insert.append(Document(page_content=email_body, metadata={"Email Sender": sent_email['Sender']}))
 
         if len(emails_to_insert) == 100:
-            rag_manager = RagManager.new(user=inbox_email)
+            rag_manager = RagManager.new(user=inbox_email, embeddings_type=embeddings_type)
             print(f"inserting emails: {len(emails_to_insert)} for {inbox_email}")
             rag_manager.bulk_insert(emails_to_insert)
             all_emails.extend(emails_to_insert)
         else:
             print(f"insufficient emails to create a RAG store: {len(emails_to_insert)}")
 
-    tokenizer = tiktoken.get_encoding("cl100k_base")
-
-    token_counts = [len(tokenizer.encode(doc.page_content)) for doc in all_emails]
-
-    print(f"Number of documents: {len(token_counts)}")
-    print(f"Total tokens: {np.sum(token_counts)}")
-    print(f"Average tokens per document: {np.mean(token_counts):.2f}")
-    print(f"Median tokens per document: {np.median(token_counts)}")
-    print(f"Min tokens in a document: {np.min(token_counts)}")
-    print(f"Max tokens in a document: {np.max(token_counts)}")
-    print(f"Standard deviation of tokens: {np.std(token_counts):.2f}")
-
 
 if __name__ == "__main__":
-    build_vector_database()
+    build_vector_database(embeddings_type=EmbeddingsType.GTELarge)
     # document = create_self_replicating_prompt()
     # rag_manager = RagManager.new()
     # rag_manager.insert(document)

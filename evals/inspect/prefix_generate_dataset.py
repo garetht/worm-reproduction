@@ -1,8 +1,8 @@
 # Tests the effect of various prefixes on worm retrieval success rate
-import hashlib
 import json
 import math
 import uuid
+from collections import defaultdict
 from itertools import product
 
 from tqdm import tqdm
@@ -11,6 +11,7 @@ from attack.email_manager import EmailManager
 from attack.rag_context import prefixed_rag_managers
 from attack.rag_deletion import analyze_rag_worm_status
 from attack.rag_manager import RagManager
+from models.embeddings import EmbeddingsType
 from models.employee_email import EmployeeEmail
 from prompts.prefixes import PrefixPrompts
 from prompts.use_cases import UseCasePrompts
@@ -25,13 +26,13 @@ PERCENTAGE_OF_EMAILS_RETRIEVED_FROM_RAG = [
 ]
 
 
-def create_prefix_json(prefix: PrefixPrompts, percentage: float) -> list[dict]:
+def create_prefix_json(prefix: PrefixPrompts, percentage: float, embeddings_type: EmbeddingsType) -> list[dict]:
   email_manager = EmailManager()
   samples = []
   emails_by_vector_store_user = email_manager.get_emails_by_vector_store_user()
 
-  with prefixed_rag_managers(prefix=prefix.value) as managers:
-    analyze_rag_worm_status()
+  with prefixed_rag_managers(prefix=prefix.value, embeddings_type=embeddings_type) as managers:
+    analyze_rag_worm_status(embeddings_type=embeddings_type)
     for user_rag_manager in tqdm(list(managers), desc="Employee"):
       user_email = user_rag_manager.user
       all_emails = emails_by_vector_store_user[user_email]
@@ -70,17 +71,38 @@ def generate_grid():
 
   return grid
 
+def generate_embeddings_grid():
+  params = {
+    "prefixes": [PrefixPrompts.WIKIPEDIA],
+    "percentage": PERCENTAGE_OF_EMAILS_RETRIEVED_FROM_RAG,
+    "embedding_type": [EmbeddingsType.GTESmall, EmbeddingsType.GTEBase, EmbeddingsType.GTELarge]
+  }
+
+  return list(product(*(params[name] for name in params)))
+
+def generate_embeddings_dataset():
+  grid = generate_embeddings_grid()
+
+  jsons: dict[EmbeddingsType, list[dict]] = defaultdict(list)
+  for prefix, percentage, embeddings_type in tqdm(grid):
+    jsons[embeddings_type].extend(create_prefix_json(prefix, percentage, embeddings_type=EmbeddingsType.OpenAI))
+
+  for embeddings_type, contents in jsons.items():
+    with open(f"./evals/inspect/{embeddings_type.value}_dataset", "w") as f:
+      f.write(json.dumps(contents, indent=2, sort_keys=True))
+
+
 def generate_dataset():
   grid = generate_grid()
 
   output_filename = "./evals/inspect/prefix_dataset.json"
   prefix_jsons = []
   for prefix, percentage in tqdm(grid):
-    prefix_jsons.extend(create_prefix_json(prefix, percentage))
+    prefix_jsons.extend(create_prefix_json(prefix, percentage, embeddings_type=EmbeddingsType.OpenAI))
 
     with open(output_filename, "w") as f:
       f.write(json.dumps(prefix_jsons, indent=2, sort_keys=True))
 
 
 if __name__ == '__main__':
-  generate_dataset()
+  generate_embeddings_dataset()

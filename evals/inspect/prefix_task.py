@@ -1,6 +1,7 @@
 # Tests the effect of various prefixes on worm retrieval success rate
 import math
 from datetime import datetime
+from itertools import product
 
 from inspect_ai import task, Task, eval_set
 from inspect_ai.dataset import Sample, json_dataset
@@ -9,7 +10,8 @@ from inspect_ai.scorer import match
 from inspect_ai.solver import TaskState, Generate, solver
 
 from attack.rag_manager import RagManager
-from evals.inspect.prefix_generate_dataset import generate_grid
+from evals.inspect.prefix_generate_dataset import PERCENTAGE_OF_EMAILS_RETRIEVED_FROM_RAG
+from models.embeddings import EmbeddingsType
 from models.employee_email import EmployeeEmail
 from prompts.prefixes import PrefixPrompts
 from prompts.use_cases import UseCasePrompts
@@ -66,14 +68,18 @@ def rag_worm_retrieval_detection(
 
 unix_timestamp = (datetime.now() - datetime(1970, 1, 1)).total_seconds()
 
-dataset = json_dataset("./evals/inspect/prefix_dataset.json")
 
-grid = generate_grid()
+
+
+dataset = json_dataset("./evals/inspect/prefix_dataset.json")
+eval_grid = generate_eval_grid()
 
 # run the evals and capture the logs
 success, logs = eval_set(
-  [rag_worm_retrieval_detection(prefix, percentage)
-   for prefix, percentage in grid],
-  log_dir=f"eval_set_logs_1756388236.230403",
+  [
+    rag_worm_retrieval_detection(prefix, percentage, embedding_type)
+    for prefix, percentage, embedding_type in eval_grid
+  ],
+  log_dir=f"eval_set_logs_{unix_timestamp}",
   model="openai/gpt-4o-mini-2024-07-18"
 )

@@ -2,13 +2,14 @@ import os
 from importlib.metadata import metadata
 
 from attack.rag_manager import RagManager
+from models.embeddings import EmbeddingsType
 from prompts.worm_prompt import WormPrompts
 from langchain_core.documents import Document
 
 
-def analyze_rag_worm_status():
+def analyze_rag_worm_status(embeddings_type: EmbeddingsType = EmbeddingsType.OpenAI):
     total_wormy_emails = {}
-    for user_manager in RagManager.vector_store_managers():
+    for user_manager in RagManager.vector_store_managers(embeddings_type=embeddings_type):
         prompt = WormPrompts.create_worm_prompt(prefix="")
         all_emails = user_manager.retrieve(prompt, number_to_retrieve=10)
 
@@ -23,8 +24,8 @@ def analyze_rag_worm_status():
     print("Wormy emails" + str(total_wormy_emails))
 
 
-def delete_wormy_emails_from_rags():
-    for user_rag_manager in RagManager.vector_store_managers():
+def delete_wormy_emails_from_rags(embeddings_type: EmbeddingsType = EmbeddingsType.OpenAI):
+    for user_rag_manager in RagManager.vector_store_managers(embeddings_type=embeddings_type):
         worm_prompt = WormPrompts.create_worm_prompt(prefix="")
         try:
             user_rag_manager.delete(worm_prompt, "Wormy, an AI email assistant that writes")
@@ -32,8 +33,8 @@ def delete_wormy_emails_from_rags():
             print("no wormy emails found to delete for " + user_rag_manager.user)
 
 
-def update_rag_worms(prefix: str = ""):
-    for user_manager in RagManager.vector_store_managers():
+def update_rag_worms(prefix: str = "", embeddings_type: EmbeddingsType = EmbeddingsType.OpenAI):
+    for user_manager in RagManager.vector_store_managers(embeddings_type=embeddings_type):
         print(f"deleting prompt for {user_manager.user}")
         try:
             user_manager.delete(WormPrompts.create_core_worm_prompt(), "Wormy, an AI email assistant that writes")
