@@ -1,8 +1,9 @@
 import os
+from importlib.metadata import metadata
 
-from attack.construct_vector_db import create_self_replicating_prompt
 from attack.rag_manager import RagManager
 from prompts.worm_prompt import WormPrompts
+from langchain_core.documents import Document
 
 
 def analyze_rag_worm_status():
@@ -19,27 +20,30 @@ def analyze_rag_worm_status():
         total_wormy_emails[user_manager.user] = wormy_emails
 
     print("Analyzing wormy status of each user's RAG")
-    print(total_wormy_emails)
+    print("Wormy emails" + str(total_wormy_emails))
 
 
 def delete_wormy_emails_from_rags():
     for user_rag_manager in RagManager.vector_store_managers():
         worm_prompt = WormPrompts.create_worm_prompt(prefix="")
-        user_rag_manager.delete(worm_prompt, "Wormy, an AI email assistant that writes")
-
-
-def update_rag_worms():
-    for user in RagManager.vector_store_users():
-        print(f"deleting and recreating prompt for {user}")
-        manager = RagManager(user=user)
-        prompt = WormPrompts.create_worm_prompt(prefix="")
         try:
-            manager.delete(prompt.page_content, "Wormy, an AI email assistant that writes")
+            user_rag_manager.delete(worm_prompt, "Wormy, an AI email assistant that writes")
+        except ValueError:
+            print("no wormy emails found to delete for " + user_rag_manager.user)
+
+
+def update_rag_worms(prefix: str = ""):
+    for user_manager in RagManager.vector_store_managers():
+        print(f"deleting prompt for {user_manager.user}")
+        try:
+            user_manager.delete(WormPrompts.create_core_worm_prompt(), "Wormy, an AI email assistant that writes")
         except ValueError:
             pass
 
-        # manager.insert(prompt)
-        manager.retrieve(prompt.page_content, number_to_retrieve=10)
+        print(f"recreating prompt for {user_manager.user}")
+        new_prompt = WormPrompts.create_worm_prompt(prefix=prefix)
+        print("inserting new prompt")
+        user_manager.insert(Document(page_content=new_prompt, metadata={"Email Sender": "attacky@attacker.com"}))
 
 
 if __name__ == "__main__":

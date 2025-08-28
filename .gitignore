@@ -18,3 +18,7 @@ database
 vector_store
 .DS_Store
 *.ipynb
+
+eval_set_logs_*
+prefix_dataset.json
+logs

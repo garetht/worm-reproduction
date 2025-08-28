@@ -15,7 +15,7 @@ def build_email() -> str:
 
 
 def worm_attack():
-    manager = RagManager(user=" andrea.ring@enron.com")
+    manager = RagManager.new(user=" andrea.ring@enron.com")
     new_email = build_email()
     retrieved_rag_docs = manager.retrieve(new_email)
     print(f"{len(retrieved_rag_docs)=}")

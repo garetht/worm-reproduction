@@ -27,6 +27,9 @@ class EmployeeEmail:
             Body=get_text_body(parsed_mail.message)
         )
 
+    def __str__(self):
+        return "<EmployeeEmail/>"
+
 
 def get_text_body(msg: email.message.Message) -> str:
     if msg.is_multipart():

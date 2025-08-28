@@ -30,8 +30,8 @@ class EmailManager:
             ]
             emails_by_vector_store_user[email] = self._format_emails(user_emails)
 
-        for value in emails_by_vector_store_user.values():
-            print(len(value))
+        # for value in emails_by_vector_store_user.values():
+        #     print(len(value))
 
         return emails_by_vector_store_user
 

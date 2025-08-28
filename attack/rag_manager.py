@@ -5,12 +5,25 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
 
+from attack import locations
+
 
 class RagManager:
     user: str
     embeddings: OpenAIEmbeddings
 
-    VECTOR_STORE_DIR = './vector_store'
+    VECTOR_STORE_DIR = locations.current_path / 'vector_store'
+
+    MANAGER_CACHE = {}
+
+    @classmethod
+    def new(cls, user: str) -> 'RagManager':
+        if cls.MANAGER_CACHE.get(user) is not None:
+            return cls.MANAGER_CACHE[user]
+
+        manager = RagManager(user=user)
+        cls.MANAGER_CACHE[user] = manager
+        return manager
 
     def __init__(self, user: str):
         self.user = user
@@ -20,6 +33,7 @@ class RagManager:
         os.makedirs(self.user_path, exist_ok=True)
 
         file_path = os.path.join(self.user_path, "index.faiss")
+        print(file_path)
         if not os.path.exists(file_path):
             self.db = None
         else:
@@ -29,7 +43,7 @@ class RagManager:
     @classmethod
     def vector_store_managers(cls) -> Iterable['RagManager']:
         for user in cls.vector_store_users():
-            yield RagManager(user=user)
+            yield RagManager.new(user=user)
 
     @classmethod
     def vector_store_users(cls) -> Iterable[str]:
@@ -74,7 +88,7 @@ class RagManager:
         for doc in retrieved:
             if deletion_phrase in doc.page_content:
                 document_ids.append(doc.id)
-                print(doc.page_content)
+                print(f"Document of length {len(doc.page_content)} was deleted")
 
         print("now deleting document ids: {}".format(document_ids))
 
