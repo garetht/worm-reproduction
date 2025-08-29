@@ -67,7 +67,7 @@ class RagManager:
     @classmethod
     def vector_store_managers(cls, embeddings_type: EmbeddingsType = EmbeddingsType.OpenAI) -> Iterable['RagManager']:
         for user in cls.vector_store_users(embeddings_type=embeddings_type):
-            yield RagManager.new(user=user)
+            yield RagManager.new(user=user, embeddings_type=embeddings_type)
 
     @classmethod
     def vector_store_users(cls, embeddings_type: EmbeddingsType = EmbeddingsType.OpenAI) -> Iterable[str]:

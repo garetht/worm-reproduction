@@ -51,6 +51,17 @@ class EmailManager:
 
         return results
 
+    def retrieve_emails(self) -> list[EmployeeEmail]:
+        """
+        Retrieves all emails received by a given user.
+        """
+        # For received emails, the 'Sender' column holds the recipient's email.
+        received_emails = self.emails_df[
+            (self.emails_df['SentOrRec'] == 'Rec')
+        ]
+
+        return [r["Sender"] for index, r in received_emails.iterrows()]
+
     def retrieve_email_inbox(self, email: str) -> list[EmployeeEmail]:
         """
         Retrieves all emails received by a given user.

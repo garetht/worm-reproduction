@@ -22,7 +22,7 @@ PERCENTAGE_OF_EMAILS_RETRIEVED_FROM_RAG = [
   0.40,
   0.60,
   0.80,
-  1.00,
+  # 1.00,
 ]
 
 
@@ -37,7 +37,7 @@ def create_prefix_json(prefix: PrefixPrompts, percentage: float, embeddings_type
       user_email = user_rag_manager.user
       all_emails = emails_by_vector_store_user[user_email]
 
-      for email_to_respond_to in tqdm(all_emails[:20], desc="Email"):
+      for email_to_respond_to in tqdm(all_emails[:10], desc="Email"):
         samples.append(
           create_json(prefix, email_to_respond_to, percentage, user_email, user_rag_manager)
         )
@@ -85,10 +85,10 @@ def generate_embeddings_dataset():
 
   jsons: dict[EmbeddingsType, list[dict]] = defaultdict(list)
   for prefix, percentage, embeddings_type in tqdm(grid):
-    jsons[embeddings_type].extend(create_prefix_json(prefix, percentage, embeddings_type=EmbeddingsType.OpenAI))
+    jsons[embeddings_type].extend(create_prefix_json(prefix, percentage, embeddings_type=embeddings_type))
 
   for embeddings_type, contents in jsons.items():
-    with open(f"./evals/inspect/{embeddings_type.value}_dataset", "w") as f:
+    with open(f"./evals/inspect/{embeddings_type.value}_dataset.json", "w") as f:
       f.write(json.dumps(contents, indent=2, sort_keys=True))
 
 

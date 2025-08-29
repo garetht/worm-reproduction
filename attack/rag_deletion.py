@@ -48,6 +48,6 @@ def update_rag_worms(prefix: str = "", embeddings_type: EmbeddingsType = Embeddi
 
 
 if __name__ == "__main__":
-    analyze_rag_worm_status()
-    delete_wormy_emails_from_rags()
-    analyze_rag_worm_status()
+    analyze_rag_worm_status(embeddings_type=EmbeddingsType.GTESmall)
+    delete_wormy_emails_from_rags(embeddings_type=EmbeddingsType.GTESmall)
+    analyze_rag_worm_status(embeddings_type=EmbeddingsType.GTESmall)

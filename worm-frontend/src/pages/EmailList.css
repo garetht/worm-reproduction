@@ -1,5 +1,5 @@
 .email-list-container {
-  width: 800px;
+  width: 1200px;
   margin: 0 auto;
   padding: 2rem;
 }
@@ -31,10 +31,27 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-right: 2rem;
 }
 
 .email-snippet {
+  display: flex;
+  flex-direction: row;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.email-subject {
+  text-align: left;
+  font-weight: bold;
+  flex-grow: 1;
+  min-width: 350px;
+  padding-right: 2em;
+}
+
+.email-body-preview {
+  color: #888;
+  flex-grow: 2;
+}
+
