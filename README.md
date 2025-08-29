@@ -5,6 +5,8 @@ This is a partial replication and demo of the paper [Here Comes The AI Worm: Unl
 
 ## Experiment Replication
 
+We used the same environment as the paper authors to perform replications. The dataset we use is a list of emails from the Enron database. We randomly selected 12 unique users from the dataset, identified according to their email addresses, who had at least 100 emails (50 emails received and 50 emails sent) in the `inbox`, `sent`, or `sent_items` folders. Our analysis is based on 240 emails per user. 
+
 We focus first on recreating a simple RAG-based worm that operates through an email. When a user wishes to perform an LLM-assisted email action, such as drafting an email, it may query the RAG for relevant emails. If one of these relevant emails is the worm, the RAG-assisted action may read the worm in as a prompt injection and place a copy of the worm in the email reply, thereby replicating it and spreading it to other users. This minimal example is recreated in `attack/worm_attack.py`.
 
 Having had success with this simple replication, we then move on to performing experiments to determine what factors influence the efficacy of this attack. We focus on two variables: firstly, varying the prefix prompt. Changing this allows us to fool the RAG into thinking that the email containing the worm is relevant to any particular email the user wishes to reply to, increasing the likelihood that it will be retrieved from the RAG for duplication. Secondly, we vary the percentage of a user's total email inbox that is retrieved for use in the RAG. This allows us to see  
@@ -12,6 +14,15 @@ Having had success with this simple replication, we then move on to performing e
 We keep track of two metrics to determine how successful such an attack is. We track the retrieval success rate of the worm from the RAG. This measures what percentage of all retrievals that were performed from the RAG contained the worm-infected email. We also keep track of the replication success rate of the worm. Given that it has been retrieved from the RAG and inserted into the LLM's context, this measures how often the worm is successfully replicated in full from the poisoned prompt.
 
 ### Results
+
+Our replication of retrieval success for different prefixes roughly matched what we found in the paper. We tested the same five prefixes that they did, and found the retrieval success rates to be ordered the same as the paper's results. The Wikipedia prefix, consisting of the first paragraph of text in the Enron database, was also produced the highest retreival success rate with the smallest percentage of emails retrieved from the RAG.
+
+![](./evals/graphs/results/retrieval_success.png)
+
+There was less success in reproducing the paper's results for the replication success rate. 
+
+![](./evals/graphs/results/replication_success.png)
+
 
 
 ## Demonstration
