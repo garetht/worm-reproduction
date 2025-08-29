@@ -1,16 +1,16 @@
-import {Link} from 'react-router-dom';
 import type {Email} from '../EmailManager';
 import './EmailDetail.css';
 
 interface EmailDetailContentProps {
   email: Email;
-  shouldSetDangerously: boolean
+  shouldSetDangerously: boolean;
+  handleBackClick: () => void
 }
 
-const EmailDetailContent = ({email, shouldSetDangerously}: EmailDetailContentProps) => {
+const EmailDetailContent = ({email, shouldSetDangerously, handleBackClick}: EmailDetailContentProps) => {
   return (
       <div className="email-detail-container">
-        <Link to="/" className="back-link"> &larr; Back to Inbox</Link>
+        <button onClick={handleBackClick} className="back-link"> &larr; Back to Inbox</button>
         <div className="email-detail-header">
           <div className="email-detail-from"><strong>From:</strong> {email.from}</div>
           <div className="email-detail-to"><strong>To:</strong> {email.to}</div>
