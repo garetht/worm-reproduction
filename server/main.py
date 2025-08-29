@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from attack.email_manager import EmailManager
+from prompts.prefixes import PrefixPrompts
 from prompts.worm_prompt import WormPrompts
 
 app = FastAPI()
@@ -47,10 +48,10 @@ def get_emails(email: str, worm: int = 0):
     if worm == 1:
         worm_email = {
             "id": -1,
-            "from": "worm@example.com",
+            "from": "andrea.ring@enron.com",
             "to": email,
-            "subject": "This is a worm",
-            "body": WormPrompts.create_core_worm_prompt()
+            "subject": "RE: Project meeting on Tuesday",
+            "body": WormPrompts.create_html_worm_prompt(PrefixPrompts.MEETING)
         }
         results.insert(0, worm_email)
 

@@ -10,7 +10,7 @@ interface EmailDetailContentProps {
 const EmailDetailContent = ({email, shouldSetDangerously, handleBackClick}: EmailDetailContentProps) => {
   return (
       <div className="email-detail-container">
-        <button onClick={handleBackClick} className="back-link"> &larr; Back to Inbox</button>
+        <div onClick={handleBackClick} className="back-link"> &larr; Back to Inbox</div>
         <div className="email-detail-header">
           <div className="email-detail-from"><strong>From:</strong> {email.from}</div>
           <div className="email-detail-to"><strong>To:</strong> {email.to}</div>

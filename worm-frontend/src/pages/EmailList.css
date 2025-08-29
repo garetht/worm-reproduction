@@ -11,6 +11,11 @@
   text-align: left;
 }
 
+.email-deliver-worm {
+  margin: 2em 0;
+  margin-right: 0;
+}
+
 .email-row {
   display: flex;
   align-items: center;

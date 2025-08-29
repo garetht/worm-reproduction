@@ -8,9 +8,13 @@ export interface Email {
 
 const API_URL = 'http://127.0.0.1:8000';
 
-export const getEmailsForUser = async (userEmail: string): Promise<Email[]> => {
+export const getEmailsForUser = async (userEmail: string, worm: boolean = false): Promise<Email[]> => {
   try {
-    const response = await fetch(`${API_URL}/emails/${userEmail}`);
+    const url = new URL(`${API_URL}/emails/${userEmail}`);
+    if (worm) {
+      url.searchParams.append('worm', '1');
+    }
+    const response = await fetch(url.toString());
     if (!response.ok) {
       throw new Error('Failed to fetch emails');
     }

@@ -9,16 +9,18 @@ const EmailList = () => {
   const [emails, setEmails] = useState<Email[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
+  const [deliverWorm, setDeliverWorm] = useState(false);
 
   useEffect(() => {
     const fetchEmails = async () => {
-      const fetchedEmails = await getEmailsForUser(userEmail);
+      setLoading(true);
+      const fetchedEmails = await getEmailsForUser(userEmail, deliverWorm);
       setEmails(fetchedEmails);
       setLoading(false);
     };
 
     fetchEmails();
-  }, []);
+  }, [deliverWorm]);
 
   const handleEmailClick = (email: Email) => {
     setSelectedEmail(email);
@@ -28,6 +30,10 @@ const EmailList = () => {
     setSelectedEmail(null);
   }
 
+  const handleDeliverWorm = () => {
+    setDeliverWorm(true);
+  }
+
   if (loading) {
     return <div>Loading emails...</div>;
   }
@@ -35,7 +41,7 @@ const EmailList = () => {
   if (selectedEmail) {
     return (
         <div>
-          <MultiEmailDetail email={selectedEmail} handleBackClick={handleBackClick}/>
+          <MultiEmailDetail email={selectedEmail} handleBackClick={handleBackClick} />
         </div>
     );
   }
@@ -43,6 +49,7 @@ const EmailList = () => {
   return (
       <div className="email-list-container">
         <h1 className="email-list-header">{userEmail}'s Inbox</h1>
+        <button className="email-deliver-worm" onClick={handleDeliverWorm}>Deliver Worm</button>
         <div>
           {emails.map(email => (
               <div onClick={() => handleEmailClick(email)} key={email.id} className="email-row">
