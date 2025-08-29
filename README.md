@@ -19,16 +19,23 @@ Our replication of retrieval success for different prefixes roughly matched what
 
 ![](./evals/graphs/results/retrieval_success.png)
 
-There was less success in reproducing the paper's results for the replication success rate. 
+There was less success in reproducing the paper's results for the replication success rate. Our replication success rate did not reach far beyond 50%, while the paper managed to achieve 100% replication even when all emails were retrieved from the context. We hypothesize that our low replication success is because `gpt-4o-mini` is unable to correctly place attention on the worm prompt when the context window is sufficiently long.
 
 ![](./evals/graphs/results/replication_success.png)
 
-
-
 ## Demonstration
 
-Separately, we create a demonstration proof of concept of how this attack might work in an email client. In this 
+Separately, we create a demonstration proof of concept of how this attack might work in an email client. 
 
+The demonstration tools provide two features.
+
+1. Deliver a worm. This shows what an email with a worm will look like in a sample email client. On the left hand side of the interface we inject HTML directly into the email client using React's `dangerouslySetInnerHTML`, which shows how the worm can be obscured through an improperly secured email client. On the right hand side of the interface, we properly escape HTML in the email, which makes the worm visible.
+
+![](./worm-frontend/recordings/worm-delivery.mp4)
+
+2. Draft an email response with a worm (note that this relies on setting the `OPENAI_API_KEY` variable to your OpenAI key when running the server). In this demonstration, we assume that a worm already exists in the user's email inbox and that it has been successfully retrieved as one of the emails to be used as the context to generate an email reply. Clicking on the Draft Response button produces an email with a response generated with a poisoned RAG context.
+
+![](./worm-frontend/recordings/draft-email-response.mp4)
 
 ## Backend Structure
 
