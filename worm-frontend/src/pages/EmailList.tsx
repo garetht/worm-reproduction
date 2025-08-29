@@ -55,10 +55,10 @@ const EmailList = () => {
               <div onClick={() => handleEmailClick(email)} key={email.id} className="email-row">
                 <div className="email-snippet">
                   <div className="email-subject">
-                    {email.subject.substring(0, 35)}...
+                    {email.subject.substring(0, 40)}{email.subject.length > 40 ? '...' : ''}
                   </div>
                   <div className="email-body-preview">
-                    {email.body.substring(0, 100)}...
+                    {email.body.substring(0, 100)}{email.body.length > 100 ? '...' : ''}
                   </div>
                 </div>
               </div>
