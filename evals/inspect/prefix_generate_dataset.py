@@ -67,9 +67,7 @@ def generate_grid():
     "prefixes": [p for p in PrefixPrompts],
     "percentage": PERCENTAGE_OF_EMAILS_RETRIEVED_FROM_RAG
   }
-  grid = list(product(*(params[name] for name in params)))
-
-  return grid
+  return list(product(*(params[name] for name in params)))
 
 def generate_embeddings_grid():
   params = {

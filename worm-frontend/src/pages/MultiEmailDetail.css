@@ -1,8 +1,29 @@
 .multi-email-container {
   display: flex;
+  flex-wrap: wrap; 
   gap: 1rem;
 }
 
-.multi-email-container .email-detail-container {
+.email-pair-container {
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+}
+
+.email-pair-container > div {
   width: 50%;
+}
+
+.draft-controls {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.draft-response-container {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.draft-response-container h3 {
+  margin-bottom: 0.5rem;
 }

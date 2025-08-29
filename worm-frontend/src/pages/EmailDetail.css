@@ -12,13 +12,7 @@
   margin-bottom: 2rem;
 }
 
-.email-detail-subject {
-  font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.email-detail-from, .email-detail-to {
+.email-detail-from, .email-detail-to, .email-detail-subject {
   font-size: 1rem;
   color: #555;
   margin-bottom: 0.5rem;
